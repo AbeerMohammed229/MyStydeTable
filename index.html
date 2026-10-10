@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>جدول مذاكرتي المطور</title>
+<meta name="theme-color" content="#6c5ce7">
+<link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoi2KzYr9mF2Yog2YXYrbDZs9ix2KrYqNmIIiwic2hvcnRfbmFtZSI6ItmF2KfYp9ix2KrYqCIsInN0YXJ0X3VybCI6Ii4iLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsImJhY2tncm91bmRfY29sb3IiOiIjZjBmMGZmIiwidGhlbWVfY29sb3IiOiIjNmM1Y2U3In0=">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800&display=swap');
+*{font-family:'Tajawal',sans-serif;box-sizing:border-box;margin:0;padding:0}
+body{background:#f0f0ff;padding:12px;padding-bottom:100px}
+h1{text-align:center;color:#6c5ce7;margin:12px 0;font-size:20px}
+button{cursor:pointer}
+.topbar{display:flex;gap:8px;justify-content:center;margin-bottom:12px}
+.btn{border:none;padding:8px 16px;border-radius:20px;font-weight:700}
+.btn-settings{background:#6c5ce7;color:white}
+.btn-save{background:#00b894;color:white}
+.progress{background:white;padding:12px;border-radius:15px;text-align:center;margin-bottom:12px;box-shadow:0 2px 10px #0001}
+.bar{height:10px;background:#eee;border-radius:10px;overflow:hidden;margin-top:6px}
+.fill{height:100%;background:linear-gradient(90deg,#00b894,#00cec9);width:0%;transition:.4s}
+.timer{background:linear-gradient(135deg,#2d3436,#636e72);color:white;border-radius:18px;padding:12px;text-align:center;margin-bottom:12px}
+.time{font-size:32px;font-weight:800}
+.tbtn{border:none;padding:6px 14px;border-radius:20px;font-weight:700;margin:3px}
+.start{background:#00b894;color:white}.pause{background:#fdcb6e}.reset{background:#dfe6e9}
+#settingsPanel{display:none;background:white;border-radius:18px;padding:14px;margin-bottom:14px;box-shadow:0 5px 20px #0002;border:2px solid #6c5ce7}
+#settingsPanel.open{display:block}
+.set-sec{margin-bottom:16px;padding-bottom:12px;border-bottom:1px dashed #eee}
+.set-sec h3{font-size:14px;color:#6c5ce7;margin-bottom:8px}
+.row{display:flex;gap:6px;margin-bottom:6px;flex-wrap:wrap;align-items:center}
+.row input,.row select{padding:6px 8px;border-radius:8px;border:1px solid #ddd;font-size:13px}
+.inp-small{width:70px}.inp-med{width:140px}.inp-large{flex:1;min-width:120px}
+.del{background:#ff7675;color:white;border:none;border-radius:8px;padding:5px 9px;font-size:12px}
+.add{background:#dfe6e9;border:none;border-radius:8px;padding:6px 12px;font-size:12px;margin-top:4px}
+.days{background:white;border-radius:18px;padding:14px;margin-bottom:14px;box-shadow:0 3px 12px #0001;overflow-x:auto}
+.days h2{font-size:15px;color:#6c5ce7;margin-bottom:10px;text-align:center}
+table{width:100%;border-collapse:collapse;font-size:12px;min-width:400px}
+th{background:#6c5ce7;color:white;padding:8px;border-radius:8px;white-space:nowrap}
+td{padding:10px 6px;text-align:center;border-bottom:1px solid #f1f2f6}
+.period{background:#ede7f6;border-radius:8px;margin:2px}
+.subject{background:white;border-radius:18px;padding:14px;margin-bottom:12px;box-shadow:0 3px 12px #0001}
+.subject h3{font-size:14px;margin-bottom:4px;display:flex;justify-content:space-between}
+.info{font-size:10px;color:#888;margin-bottom:8px}
+.boxes{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.box{border:2px solid #dfe6e9;border-radius:11px;padding:11px 0;text-align:center;font-weight:800;background:#fafafa;position:relative}
+.box.done{background:#00b894!important;color:white;border-color:#00b894}
+.box.has-note::after{content:"📝";position:absolute;top:1px;left:3px;font-size:8px}
+.note-btn{width:100%;margin-top:4px;font-size:9px;background:#f1f2f6;border:none;border-radius:6px;padding:3px}
+.resetAll{position:fixed;bottom:12px;left:50%;transform:translateX(-50%);background:#2d3436;color:white;border:none;padding:9px 20px;border-radius:25px;font-weight:700}
+</style>
+</head>
+<body>
+<h1>📚 جدول مذاكرتي</h1>
+<div class="topbar">
+<button class="btn btn-settings" onclick="toggleSettings()">⚙️ الإعدادات</button>
+<button class="btn btn-save" onclick="saveAll()">💾 حفظ</button>
+</div>
+<div id="settingsPanel">
+  <div class="set-sec"><h3>📘 المواد</h3><div id="subjectsEdit"></div><button class="add" onclick="addSubject()">+ إضافة مادة</button></div>
+  <div class="set-sec"><h3>🗓️ الأيام والفترات</h3><div id="daysEdit"></div><button class="add" onclick="addDay()">+ إضافة يوم</button></div>
+  <button class="btn btn-save" style="width:100%" onclick="saveAll();toggleSettings()">تم ✅</button>
+</div>
+<div class="progress"><div><b id="done">0</b> / <b id="total">0</b> - <b id="pct">0%</b></div><div class="bar"><div class="fill" id="fill"></div></div></div>
+<div class="timer"><div style="font-size:11px">⏰ <span id="tSub">اختاري محاضرة للقراية</span></div><div class="time" id="time">25:00</div><button class="tbtn start" onclick="startT()">ابدأ</button><button class="tbtn pause" onclick="pauseT()">وقف</button><button class="tbtn reset" onclick="resetT()">إعادة</button></div>
+<div class="days"><h2>🗓️ جدول الأيام</h2><table id="scheduleTable"></table></div>
+<div id="app"></div>
+<button class="resetAll" onclick="if(confirm('تمسحي كل التقدم؟')){localStorage.removeItem('done');localStorage.removeItem('notes');location.reload()}">🔄 مسح التقدم</button>
+<script>
+const defaultData={subjects:[{id:"plc",name:"Programming Language Concept",lec:12},{id:"cloud",name:"Cloud Computing",lec:12},{id:"dm",name:"Data Mining",lec:12},{id:"pt",name:"Professional Training",lec:12},{id:"ai",name:"A",lec:12},{id:"hci",name:"Human Computer Interaction",lec:12},{id:"se2",name:"Software Engineering 2",lec:12}],days:[{name:"الجمعة",periods:[{time:"9-12 صباح",sub:"plc"},{time:"7-10 مساء",sub:"cloud"}]},{name:"السبت",periods:[{time:"9-12 صباح",sub:"dm"},{time:"7-10 مساء",sub:"pt"}]},{name:"الأحد",periods:[{time:"9-12 صباح",sub:"ai"},{time:"7-10 مساء",sub:"hci"}]},{name:"الإثنين",periods:[{time:"9-12 صباح",sub:"se2"},{time:"7-10 مساء",sub:"plc"}]}]};
+let data=JSON.parse(localStorage.getItem("myStudyData")||JSON.stringify(defaultData));
+let done=JSON.parse(localStorage.getItem("done")||"{}");
+let notes=JSON.parse(localStorage.getItem("notes")||"{}");
+function toggleSettings(){document.getElementById("settingsPanel").classList.toggle("open");if(document.getElementById("settingsPanel").classList.contains("open"))renderSettings();}
+function renderSettings(){let sHtml="";data.subjects.forEach((s,i)=>{sHtml+=`<div class="row"><input class="inp-large" value="${s.name}" onchange="data.subjects[${i}].name=this.value;renderPreview()"><input class="inp-small" type="number" value="${s.lec}" min="1" onchange="data.subjects[${i}].lec=parseInt(this.value)||1"><button class="del" onclick="data.subjects.splice(${i},1);renderSettings();renderPreview()">حذف</button></div>`;});document.getElementById("subjectsEdit").innerHTML=sHtml;let dHtml="";data.days.forEach((d,di)=>{dHtml+=`<div style="background:#f8f8ff;padding:8px;border-radius:10px;margin-bottom:8px"><div class="row"><input class="inp-med" value="${d.name}" onchange="data.days[${di}].name=this.value;renderPreview()"><button class="del" onclick="data.days.splice(${di},1);renderSettings();renderPreview()">حذف اليوم</button></div>`;d.periods.forEach((p,pi)=>{let opts=data.subjects.map(sub=>`<option value="${sub.id}" ${sub.id==p.sub?'selected':''}>${sub.name}</option>`).join("");dHtml+=`<div class="row"><input class="inp-small" value="${p.time}" onchange="data.days[${di}].periods[${pi}].time=this.value;renderPreview()"><select class="inp-large" onchange="data.days[${di}].periods[${pi}].sub=this.value;renderPreview()">${opts}</select><button class="del" onclick="data.days[${di}].periods.splice(${pi},1);renderSettings();renderPreview()">x</button></div>`;});dHtml+=`<button class="add" onclick="data.days[${di}].periods.push({time:'فترة جديدة',sub:data.subjects[0]?.id||''});renderSettings();renderPreview()">+ فترة</button></div>`;});document.getElementById("daysEdit").innerHTML=dHtml;}
+function addSubject(){const id="s"+Date.now();data.subjects.push({id:id,name:"مادة جديدة",lec:12});renderSettings();renderPreview();}
+function addDay(){data.days.push({name:"يوم جديد",periods:[{time:"9-12",sub:data.subjects[0]?.id||''}]});renderSettings();renderPreview();}
+function saveAll(){localStorage.setItem("myStudyData",JSON.stringify(data));localStorage.setItem("done",JSON.stringify(done));localStorage.setItem("notes",JSON.stringify(notes));render();renderPreview();alert("تم الحفظ ✅");}
+function renderPreview(){let maxP=Math.max(0,...data.days.map(d=>d.periods.length));let head="<tr><th>اليوم</th>";for(let i=0;i<maxP;i++)head+=`<th>فترة ${i+1}</th>`;head+="</tr>";let body="";data.days.forEach(d=>{body+=`<tr><td><b>${d.name}</b></td>`;for(let i=0;i<maxP;i++){let p=d.periods[i];if(p){let subName=data.subjects.find(s=>s.id==p.sub)?.name||p.sub;body+=`<td class="period">⏰ ${p.time}<br><b>${subName}</b></td>`}else body+=`<td>-</td>`}body+="</tr>";});document.getElementById("scheduleTable").innerHTML=head+body;}
+function saveProg(){localStorage.setItem("done",JSON.stringify(done));localStorage.setItem("notes",JSON.stringify(notes));update();}
+function toggle(id,num){const k=id+"_"+num;if(done[k])delete done[k];else done[k]=true;const subName=data.subjects.find(s=>s.id==id)?.name||id;document.getElementById("tSub").textContent=subName+" - محاضرة "+num;saveProg();render();}
+function addNote(id,num){const k=id+"_"+num;const old=notes[k]||"";const t=prompt("ملاحظتك لمحاضرة "+num+":",old);if(t===null)return;if(t.trim()=="")delete notes[k];else notes[k]=t.trim();saveProg();render();}
+function update(){const c=Object.keys(done).length;const total=data.subjects.reduce((a,b)=>a+b.lec,0);const p=total?Math.round(c/total*100):0;document.getElementById("done").textContent=c;document.getElementById("total").textContent=total;document.getElementById("pct").textContent=p+"%";document.getElementById("fill").style.width=p+"%";}
+function render(){const app=document.getElementById("app");app.innerHTML="";data.subjects.forEach(sub=>{let h="";for(let i=1;i<=sub.lec;i++){const k=sub.id+"_"+i;const d=done[k];const n=notes[k];h+=`<div><div class="box ${d?'done':''} ${n?'has-note':''}" onclick="toggle('${sub.id}',${i})">${d?'✓ '+i:i}</div><button class="note-btn" onclick="addNote('${sub.id}',${i})">${n?'📝 تعديل':'📝'}</button></div>`;}app.innerHTML+=`<div class="subject"><h3><span>📘 ${sub.name}</span><span style="font-size:10px;color:#888">${sub.lec} محاضرة</span></h3><div class="info">دوسي الرقم = إكمال ✅ | دوسي 📝 = ملاحظة</div><div class="boxes">${h}</div></div>`;});update();}
+let sec=25*60,inter=null,run=false;
+function showT(){const m=String(Math.floor(sec/60)).padStart(2,'0');const s=String(sec%60).padStart(2,'0');document.getElementById("time").textContent=m+":"+s;}
+function startT(){if(run)return;run=true;inter=setInterval(()=>{if(sec>0){sec--;showT();}else{clearInterval(inter);run=false;alert("🎉 خلصتي 25 دقيقة، بريك 5 دقايق!");sec=25*60;showT();}},1000);}
+function pauseT(){clearInterval(inter);run=false;}
+function resetT(){pauseT();sec=25*60;showT();}
+showT();render();renderPreview();renderSettings();
+</script>
+</body>
+</html>
